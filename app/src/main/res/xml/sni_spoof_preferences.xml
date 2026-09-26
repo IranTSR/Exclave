@@ -1,0 +1,36 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/sni_spoof_cat">
+
+        <SwitchPreferenceCompat
+            app:key="serverSniSpoofEnabled"
+            app:title="@string/sni_spoof_enable"
+            app:summary="@string/sni_spoof_enable_summary" />
+
+        <EditTextPreference
+            app:key="serverSniSpoofConnect"
+            app:title="@string/sni_spoof_connect"
+            app:dialogMessage="@string/sni_spoof_connect_hint"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="serverSniSpoofFakeSni"
+            app:title="@string/sni_spoof_fake_sni"
+            app:dialogMessage="@string/sni_spoof_fake_sni_hint"
+            app:useSimpleSummaryProvider="true" />
+
+        <io.nekohasekai.sagernet.widget.SimpleMenuPreference
+            app:key="serverSniSpoofUtls"
+            app:title="@string/sni_spoof_utls"
+            app:entries="@array/sni_spoof_utls_entry"
+            app:entryValues="@array/sni_spoof_utls_value" />
+
+        <io.nekohasekai.sagernet.widget.SimpleMenuPreference
+            app:key="serverSniSpoofInjector"
+            app:title="@string/sni_spoof_injector"
+            app:entries="@array/sni_spoof_injector_entry"
+            app:entryValues="@array/sni_spoof_injector_value" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

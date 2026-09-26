@@ -50,6 +50,7 @@ import libexclavecore.TrafficListener
 import java.net.UnknownHostException
 import com.github.shadowsocks.plugin.PluginManager as ShadowsocksPluginPluginManager
 import io.nekohasekai.sagernet.aidl.AppStats as AidlAppStats
+import io.nekohasekai.sagernet.snispoof.SniSpoofManager
 
 class BaseService {
 
@@ -389,6 +390,7 @@ class BaseService {
 
         fun killProcesses() {
             data.proxy?.close()
+            SniSpoofManager.stop()
             wakeLock?.apply {
                 release()
                 wakeLock = null
@@ -492,6 +494,19 @@ class BaseService {
                 try {
                     Executable.killAll()    // clean up old processes
                     preInit()
+                    // SNI spoofing: start the root sidecar before the core config is built,
+                    // so the outbound rewrite can read the loopback port. The blocking
+                    // root/file/network work runs on IO, not the main thread.
+                    if (SniSpoofManager.isEnabledFor(profile)) {
+                        try {
+                            withContext(Dispatchers.IO) {
+                                SniSpoofManager.startForRun(this@Interface as Service, profile)
+                            }
+                        } catch (e: SniSpoofManager.SniSpoofException) {
+                            stopRunner(false, e.message)
+                            return@runOnMainDispatcher
+                        }
+                    }
                     proxy.init()
                     proxy.processes = GuardedProcessPool {
                         Logs.w(it)

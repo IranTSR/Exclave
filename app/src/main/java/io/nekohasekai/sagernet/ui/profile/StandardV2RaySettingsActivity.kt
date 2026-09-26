@@ -174,6 +174,11 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
         DataStore.serverSingMuxMinStreams = singMuxMinStreams
         DataStore.serverSingMuxMaxStreams = singMuxMaxStreams
         DataStore.serverSingMuxPadding = singMuxPadding
+        DataStore.serverSniSpoofEnabled = sniSpoofEnabled == true
+        DataStore.serverSniSpoofConnect = sniSpoofConnect.orEmpty()
+        DataStore.serverSniSpoofFakeSni = sniSpoofFakeSni.orEmpty()
+        DataStore.serverSniSpoofUtls = sniSpoofUtls.orEmpty()
+        DataStore.serverSniSpoofInjector = sniSpoofInjector.orEmpty()
     }
 
     override fun StandardV2RayBean.serialize() {
@@ -285,6 +290,12 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
         singMuxMinStreams = DataStore.serverSingMuxMinStreams
         singMuxMaxStreams = DataStore.serverSingMuxMaxStreams
         singMuxPadding = DataStore.serverSingMuxPadding
+
+        sniSpoofEnabled = DataStore.serverSniSpoofEnabled
+        sniSpoofConnect = DataStore.serverSniSpoofConnect
+        sniSpoofFakeSni = DataStore.serverSniSpoofFakeSni
+        sniSpoofUtls = DataStore.serverSniSpoofUtls
+        sniSpoofInjector = DataStore.serverSniSpoofInjector
     }
 
     lateinit var encryption: ListPreference
@@ -362,6 +373,7 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
         rootKey: String?,
     ) {
         addPreferencesFromResource(R.xml.standard_v2ray_preferences)
+        addPreferencesFromResource(R.xml.sni_spoof_preferences)
 
         findPreference<EditTextPreference>(Key.SERVER_PORT)!!.apply {
             setOnBindEditTextListener(EditTextPreferenceModifiers.Port)

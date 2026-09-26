@@ -974,4 +974,36 @@
         <item>@string/tcp</item>
     </string-array>
 
+    <string-array name="sni_spoof_utls_entry">
+        <item>@string/sni_spoof_utls_default</item>
+        <item>chrome</item>
+        <item>firefox</item>
+        <item>safari</item>
+        <item>edge</item>
+        <item>randomized</item>
+        <item>none</item>
+    </string-array>
+
+    <string-array name="sni_spoof_utls_value">
+        <item></item>
+        <item>chrome</item>
+        <item>firefox</item>
+        <item>safari</item>
+        <item>edge</item>
+        <item>randomized</item>
+        <item>none</item>
+    </string-array>
+
+    <string-array name="sni_spoof_injector_entry">
+        <item>@string/sni_spoof_injector_default</item>
+        <item>active</item>
+        <item>passive</item>
+    </string-array>
+
+    <string-array name="sni_spoof_injector_value">
+        <item></item>
+        <item>active</item>
+        <item>passive</item>
+    </string-array>
+
 </resources>

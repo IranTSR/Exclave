@@ -121,6 +121,7 @@ import io.nekohasekai.sagernet.ktx.parseJson
 import io.nekohasekai.sagernet.ktx.toHysteriaPort
 import io.nekohasekai.sagernet.ktx.unescapeLineFeed
 import io.nekohasekai.sagernet.utils.PackageCache
+import io.nekohasekai.sagernet.snispoof.SniSpoofManager
 import kotlin.io.encoding.Base64
 import libexclavecore.Libexclavecore
 import java.io.File
@@ -573,6 +574,32 @@ fun buildV2RayConfig(
 
         var rootBalancer: RoutingObject.RuleObject? = null
         var rootObserver: MultiObservatoryObject.MultiObservatoryItem? = null
+
+        /**
+         * Rewrites a built outbound to dial the SNI-spoof sidecar instead of the real
+         * server. No-op unless a live sidecar session serves [proxyEntity]. The profile's
+         * own TLS/SNI settings are untouched; only the dial address changes.
+         */
+        fun applySniSpoofRewrite(proxyEntity: ProxyEntity, outbound: V2RayConfig.OutboundObject) {
+            val port = SniSpoofManager.loopbackPortFor(proxyEntity) ?: return
+            val settings = outbound.getValue() as? V2RayConfig.OutboundConfigurationObject ?: return
+            when (settings) {
+                is V2RayConfig.VMessOutboundConfigurationObject ->
+                    settings.vnext?.forEach { it.address = LOCALHOST; it.port = port }
+                is V2RayConfig.VLESSOutboundConfigurationObject ->
+                    settings.vnext?.forEach { it.address = LOCALHOST; it.port = port }
+                is V2RayConfig.TrojanOutboundConfigurationObject ->
+                    settings.servers?.forEach { it.address = LOCALHOST; it.port = port }
+                is V2RayConfig.ShadowsocksOutboundConfigurationObject ->
+                    settings.servers?.forEach { it.address = LOCALHOST; it.port = port }
+                is V2RayConfig.SocksOutboundConfigurationObject ->
+                    settings.servers?.forEach { it.address = LOCALHOST; it.port = port }
+                is V2RayConfig.HTTPOutboundConfigurationObject ->
+                    settings.servers?.forEach { it.address = LOCALHOST; it.port = port }
+                else -> return
+            }
+            Logs.i("SniSpoof: ${outbound.protocol} outbound now dials $LOCALHOST:$port")
+        }
 
         fun buildChain(
             tagOutbound: String,
@@ -2027,6 +2054,7 @@ fun buildV2RayConfig(
                 }
 
                 if (!needGlobal) {
+                    applySniSpoofRewrite(proxyEntity, currentOutbound)
                     outbounds.add(currentOutbound)
                     chainOutbounds.add(currentOutbound)
                     pastExternal = proxyEntity.needExternal()

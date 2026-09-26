@@ -96,6 +96,13 @@ public abstract class StandardV2RayBean extends AbstractBean {
     public Integer singMuxMaxStreams;
     public Boolean singMuxPadding;
 
+    // SNI spoofing (root sidecar). Only meaningful for TCP-based protocols.
+    public Boolean sniSpoofEnabled;
+    public String sniSpoofConnect;
+    public String sniSpoofFakeSni;
+    public String sniSpoofUtls;
+    public String sniSpoofInjector;
+
 
     @Override
     public boolean canMapping() {
@@ -175,11 +182,17 @@ public abstract class StandardV2RayBean extends AbstractBean {
         if (singMuxMinStreams == null) singMuxMinStreams = 0;
         if (singMuxMaxStreams == null) singMuxMaxStreams = 0;
         if (singMuxPadding == null) singMuxPadding = false;
+
+        if (sniSpoofEnabled == null) sniSpoofEnabled = false;
+        if (sniSpoofConnect == null) sniSpoofConnect = "";
+        if (sniSpoofFakeSni == null) sniSpoofFakeSni = "";
+        if (sniSpoofUtls == null) sniSpoofUtls = "";
+        if (sniSpoofInjector == null) sniSpoofInjector = "";
     }
 
     @Override
     public void serialize(ByteBufferOutput output) {
-        output.writeInt(40);
+        output.writeInt(41);
         super.serialize(output);
 
         output.writeString(uuid);
@@ -317,6 +330,12 @@ public abstract class StandardV2RayBean extends AbstractBean {
         output.writeString(serverNameToVerify);
         output.writeBoolean(hy2ChromeParrot);
         output.writeString(echQueryName);
+
+        output.writeBoolean(sniSpoofEnabled);
+        output.writeString(sniSpoofConnect);
+        output.writeString(sniSpoofFakeSni);
+        output.writeString(sniSpoofUtls);
+        output.writeString(sniSpoofInjector);
     }
 
     @Override
@@ -582,6 +601,13 @@ public abstract class StandardV2RayBean extends AbstractBean {
         }
         if (version >= 39) {
             echQueryName = input.readString();
+        }
+        if (version >= 41) {
+            sniSpoofEnabled = input.readBoolean();
+            sniSpoofConnect = input.readString();
+            sniSpoofFakeSni = input.readString();
+            sniSpoofUtls = input.readString();
+            sniSpoofInjector = input.readString();
         }
     }
 
