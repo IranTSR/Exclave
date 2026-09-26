@@ -583,7 +583,7 @@ fun buildV2RayConfig(
          */
         fun applySniSpoofRewrite(proxyEntity: ProxyEntity, outbound: V2RayConfig.OutboundObject) {
             val port = SniSpoofManager.loopbackPortFor(proxyEntity) ?: return
-            val settings = outbound.settings?.getValue() as? V2RayConfig.OutboundConfigurationObject ?: return
+            val settings = outbound.settings?.value as? V2RayConfig.OutboundConfigurationObject ?: return
             when (settings) {
                 is V2RayConfig.VMessOutboundConfigurationObject ->
                     settings.vnext?.forEach { it.address = LOCALHOST; it.port = port }
