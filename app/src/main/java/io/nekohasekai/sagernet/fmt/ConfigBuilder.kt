@@ -121,6 +121,7 @@ import io.nekohasekai.sagernet.ktx.parseJson
 import io.nekohasekai.sagernet.ktx.toHysteriaPort
 import io.nekohasekai.sagernet.ktx.unescapeLineFeed
 import io.nekohasekai.sagernet.utils.PackageCache
+import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.snispoof.SniSpoofManager
 import kotlin.io.encoding.Base64
 import libexclavecore.Libexclavecore
@@ -582,7 +583,7 @@ fun buildV2RayConfig(
          */
         fun applySniSpoofRewrite(proxyEntity: ProxyEntity, outbound: V2RayConfig.OutboundObject) {
             val port = SniSpoofManager.loopbackPortFor(proxyEntity) ?: return
-            val settings = outbound.getValue() as? V2RayConfig.OutboundConfigurationObject ?: return
+            val settings = outbound.settings?.getValue() as? V2RayConfig.OutboundConfigurationObject ?: return
             when (settings) {
                 is V2RayConfig.VMessOutboundConfigurationObject ->
                     settings.vnext?.forEach { it.address = LOCALHOST; it.port = port }
